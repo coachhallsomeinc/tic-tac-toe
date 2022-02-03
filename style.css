@@ -1,0 +1,33 @@
+/* CSS files add styling rules to your content */
+
+body {
+  font-family: helvetica, arial, sans-serif;
+  margin: 2em;
+}
+
+h1 {
+  font-style: italic;
+  color: #373fff;
+}
+
+.tile {
+    border: 1px solid grey;
+    border-radius: 10px;
+    text-align: center;
+    padding: 0px;
+}
+
+.tile .btn{
+  width:90px;
+  height:90px;
+  padding:0px;
+  margin:0px auto;
+  font-size: 67px;
+}
+
+#board {
+  max-width: 300px;
+  max-height: 300px;
+  min-width: 300px;
+  min-height: 300px;
+}
