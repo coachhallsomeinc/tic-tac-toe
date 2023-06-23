@@ -29,6 +29,7 @@ let g = null;
 
 class Game {
   constructor() {
+    // state consists of players, tiles, possibleWins, current turn, current clicks, status, grid size
     this.players = [];
     this.tiles = [];
     this.possibleWins = [
@@ -46,12 +47,14 @@ class Game {
     this.clicks = 0;
     this.status = true;
     this.toast = null;
+    this.gridSize = 3;
   }
 
   init() {
     this.players = [new Player("Player 1", "X", 1), new Player("Player 2", "O", 2)];
     this.tiles = [];
-    for (var i = 0; i < 9; i++) {
+    var tmp_size = this.gridSize*this.gridSize;
+    for (var i = 0; i < tmp_size; i++) {
       let t = new Tile(i);
       //console.log(t);
       this.tiles.push(t);
@@ -65,16 +68,14 @@ class Game {
 
   addMove(e) {
     if (this.status) {
-      var id = e.target.id.split("-");
+      var id = e.target.id.split("-")[1];
 
-      var tileId = id[1];
-
-      if (this.tiles[tileId].move == null) {
+      if (this.tiles[id].move == null) {
         let cp = this.players[this.turn];
-        let ct = this.tiles[tileId];
+        let ct = this.tiles[id];
         let m = new Move(cp, ct, cp.symbol, cp.symbolValue);
-        this.tiles[tileId].setValue(m);
-        this.turn = Number(!this.turn);
+        this.tiles[id].setValue(m);
+        this.turn = Number(!this.turn); // index for the cp players array
 
         this.clicks++;
         this.render();
@@ -91,7 +92,7 @@ class Game {
     // null = 0
     // bucket where I have valid clicks - valid click: not null, same as previous
     let winClicks = [];
-    let cp = this.players[this.turn];
+    let cp = this.players[this.turn]; // cp = current player
     var msg = cp.name + "'s turn complete";
 
     for (var i = 0; i < this.possibleWins.length; i++) { // 8 in the list
@@ -133,12 +134,12 @@ class Game {
   }
   render() {
     // build board using moves array
-    let app = document.getElementById("app");
-    app.innerHTML = "";
+    let board = document.getElementById("app");
+    board.innerHTML = "";
 
-    this.renderGUI(app);
+    this.renderGUI(board);
 
-    this.renderBoard(app);
+    this.renderBoard(board);
   }
   renderBoard(parent) {
     let board = this.uib.generateHTMLElement(
@@ -170,7 +171,7 @@ class Game {
     }
     parent.appendChild(board);
   }
-  renderGUI(app) {
+  renderGUI(parent) {
     // display
     // add header
     // add reset button
@@ -266,8 +267,43 @@ class UIBuilder {
 
 // load this when the body onload completes
 function init() {
-  g = new Game();
+  g = new Game(); // creates an instance of the game obj
   g.init();
 }
 
-//document.addEventListener('load', init);
+function testTieGame (clicks){
+
+  // create the game
+  g = new Game();
+  g.init();
+
+  // add players and reset tiles
+  g.players = [new Player("Player 1", "X", 1), new Player("Player 2", "O", 2)];
+  g.tiles = [];
+  
+  // create new tiles with moves
+  var tmp_size = g.gridSize*g.gridSize;
+  for (var i = 0; i < tmp_size; i++) {
+    let t = new Tile(i);
+    this.tiles.push(t);
+  }
+
+  // loop thru the requested clicks
+  for (var i = 0; i < clicks.length; i++) {
+    var id = clicks[i];
+    let cp = g.players[g.turn];
+    let ct = g.tiles[id];
+    let m = new Move(cp, ct, cp.symbol, cp.symbolValue);
+    g.tiles[id].setValue(m);
+    g.turn = Number(!g.turn);
+    g.clicks++;
+  }
+
+  // render the view
+  g.render();
+
+  // check win conditions
+  g.evaluateWinCondition();
+}
+
+testTieGame([0,1,2, null, null, null, null]);
